@@ -5,25 +5,88 @@
 ## Date: 2014-12-13
 ## Version: v0.1
 ## 
-## This file implements a pair of functions that cache the inverse of a matrix.
+###########################################################################################
+##
+## This file implements an object which stores matrix and its inverse
+## The following functions are defined:-
 ##    makeCacheMatrix()
-##      creates a special "matrix" object that can cache its inverse
+##        -- creates a special "matrix object" that can store both the matrix and its inverse
 ##    cacheSolve()
-##      computes the inverse of the special "matrix" returned by makeCacheMatrix 
-##      above. If the inverse has already been calculated and the matrix has not changed, 
-##      then the cachesolve retrieves the inverse from the cache.
-
-
-## Write a short comment describing this function
-
+##        -- computes the inverse of the special "matrix" created by makeCacheMatrix 
+##    set() 
+##        -- sets a value for a matrix
+##    get() 
+##        -- returns the stored matrix
+##    getinv() 
+##        -- returns the inverse of a stored matrix
+##    setinv() 
+##        --this is private function and should not be called
 
 makeCacheMatrix <- function(x = matrix()) {
+  
+  # Initial value for matrix inverse
+  mInv <- NULL
+  
+  # set() 
+  #
+  # Sets a new value for matrix and clears (possible) previous inverse
+  # Called:  makeCacheMatrix(m)
+  # Preconditions:
+  #  -- class(m) == "matrix"
+  #  -- ncol(m) == nrow(m)
+  set <- function(y) {
+    
+    # Tests if input is a matrix. If not,stop execution
+    if (!is.matrix(y)) {
+      stop("Not a matrix input")
+    }
+    
+    x <<- y
+    mInv <<- NULL
+  }
+  
+  ## get() 
+  ##
+  ## Returns stored matrix
+  ## Called:  myMatrix$get()
+  get <- function() x
 
+  ## getinv() 
+  ##
+  ## Gets the stored inverse
+  ## Called:  myMatrix$get()
+  getinv <- function() mInv
+  
+  ## setinv() 
+  ## NOTE: this is a private function which should not be called
+  ## Assumes that the given value is truly an inverse of stored matrix and stores the given value
+  setinv <- function(givenInv) mInv <<- givenInv
+  
+  ## Creates a list of function references
+  list(set = set, get = get,
+       setinv = setinv,
+       getinv = getinv)
 }
 
 
-## Write a short comment describing this function
-
+## cacheSolve() 
+##
+## Calculates the inverse of a stored matrix. Stores and returns the inverse
+## Called:  cacheSolve()
 cacheSolve <- function(x, ...) {
-        ## Return a matrix that is the inverse of 'x'
+  
+  # Read inverse and test if it is already calculated.
+  mInv <- x$getinv()
+  if (!is.null(mInv)) {
+    # Inverse exists and it is returned
+    print("from cache");
+    return(mInv)
+  } 
+  else {
+    # Inverse does not exist. It is calculated, stored and returned
+    storedMatrix <- x$get();
+    mInv <- solve(storedMatrix, ...);
+    x$setinv(mInv);  # Inverse is stored for further use
+    return(mInv)
+  }
 }
